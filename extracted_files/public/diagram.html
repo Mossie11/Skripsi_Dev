@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Database ER Diagram</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #fff; padding: 20px; }
+        .mermaid { font-size: 16px; }
+        .print-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #0C447C; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">Print to PDF</button>
+    <div class="mermaid">
+        erDiagram
+            users {
+                bigint id PK
+                varchar username UK
+                varchar password
+                varchar nama
+                enum role "admin, guru, wali_kelas"
+                varchar nip
+                int mata_pelajaran_id FK "References mata_pelajaran (For Guru)"
+                int kelas "Legacy / Info"
+                varchar no_hp
+                varchar foto
+                timestamp created_at
+                timestamp updated_at
+            }
+
+            kelas {
+                int id PK
+                varchar nama_kelas
+                int user_walikelas_id FK "References users.id (Walikelas)"
+                timestamp created_at
+            }
+
+            siswa {
+                int id PK
+                varchar nama
+                enum agama
+                varchar nis UK
+                varchar nisn UK
+                int kelas_id FK "References kelas.id"
+                enum jenis_kelamin
+                varchar no_hp
+                varchar no_hp_orangtua
+                text alamat
+                date tanggal_lahir
+                varchar foto_profil
+                timestamp created_at
+            }
+
+            mata_pelajaran {
+                int id PK
+                varchar nama_mapel UK
+                timestamp created_at
+                timestamp updated_at
+            }
+
+            tahun_ajaran {
+                int id PK
+                varchar nama UK
+                enum semester
+                tinyint is_active
+                timestamp created_at
+            }
+
+            jadwal {
+                int id PK
+                int guru_id FK "References users.id"
+                enum hari
+                time jam_mulai
+                time jam_selesai
+                int kelas_id FK "References kelas.id"
+                int mata_pelajaran_id FK "References mata_pelajaran.id"
+                enum semester
+                int tahun_ajaran_id FK "References tahun_ajaran.id"
+                varchar tahun_ajaran
+            }
+
+            kehadiran {
+                int id PK
+                int siswa_id FK "References siswa.id"
+                int kelas_id FK "References kelas.id"
+                date tanggal
+                enum status
+            }
+
+            penilaian {
+                bigint id PK
+                int siswa_id FK "References siswa.id"
+                bigint guru_id FK "References users.id"
+                int mata_pelajaran_id FK "References mata_pelajaran.id"
+                int tahun_ajaran_id FK "References tahun_ajaran.id"
+                tinyint semester
+                enum assessment_type "uh1, uh2, uts, uas, dll"
+                tinyint nilai
+                text nilai_deskriptif
+                timestamp created_at
+                timestamp updated_at
+            }
+
+            users ||--o{ kelas : "user_walikelas_id (1 to many)"
+            users }|--o| mata_pelajaran : "mata_pelajaran_id (many to 1)"
+            
+            kelas ||--o{ siswa : "kelas_id (1 to many)"
+            
+            jadwal }|--|| kelas : "kelas_id (many to 1)"
+            jadwal }|--|| mata_pelajaran : "mata_pelajaran_id (many to 1)"
+            jadwal }|--|| tahun_ajaran : "tahun_ajaran_id (many to 1)"
+            jadwal }|--|| users : "guru_id (many to 1)"
+            
+            kehadiran }|--|| siswa : "siswa_id (many to 1)"
+            kehadiran }|--|| kelas : "kelas_id (many to 1)"
+            
+            penilaian }|--|| siswa : "siswa_id (many to 1)"
+            penilaian }|--|| users : "guru_id (many to 1)"
+            penilaian }|--|| mata_pelajaran : "mata_pelajaran_id (many to 1)"
+            penilaian }|--|| tahun_ajaran : "tahun_ajaran_id (many to 1)"
+    </div>
+    
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
