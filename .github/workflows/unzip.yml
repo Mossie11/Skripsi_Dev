@@ -14,15 +14,16 @@ jobs:
       - name: Install Unrar Utility
         run: sudo apt-get update && sudo apt-get install -y unrar
 
-      - name: Extract RAR File
+      - name: Verify File Exists & Extract
         run: |
+          ls -la  # This prints files in the runner logs to verify location
           mkdir -p extracted_files
-          unrar x wr2school.rar extracted_files/
+          unrar x ./wr2school.rar ./extracted_files/
 
       - name: Commit and Push Extracted Files
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add extracted_files/
           git commit -m "Automated extraction of wr2school.rar" || echo "No changes to commit"
           git push
