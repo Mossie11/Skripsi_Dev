@@ -1,0 +1,28 @@
+name: Unrar File Automatically
+on:
+  workflow_dispatch:
+
+jobs:
+  unrar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Unrar Utility
+        run: sudo apt-get update && sudo apt-get install -y unrar
+
+      - name: Extract RAR File
+        run: |
+          mkdir -p extracted_files
+          unrar x wr2school.rar extracted_files/
+
+      - name: Commit and Push Extracted Files
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add extracted_files/
+          git commit -m "Automated extraction of wr2school.rar" || echo "No changes to commit"
+          git push
